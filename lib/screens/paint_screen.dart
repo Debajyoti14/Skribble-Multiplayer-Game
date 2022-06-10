@@ -26,7 +26,9 @@ class _PaintScreenState extends State<PaintScreen> {
     _socket.connect();
 
     //Listen to Socket
-    _socket.onConnect((data) => print(data));
+    _socket.onConnect((data) {
+      print("connected");
+    });
   }
 
   @override
