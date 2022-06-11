@@ -15,6 +15,13 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
   final TextEditingController _roomNameController = TextEditingController();
   late String? _maxRoundsValue;
   late String? _roomSizeValue;
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController.dispose();
+    _roomNameController.dispose();
+  }
+
   void createRoom() {
     if (_nameController.text.isNotEmpty &&
         _roomNameController.text.isNotEmpty &&

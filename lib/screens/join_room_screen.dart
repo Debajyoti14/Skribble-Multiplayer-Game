@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skrible/screens/paint_screen.dart';
 import 'package:skrible/widgets/custom_text_field.dart';
 
 class JoinRoomScreen extends StatefulWidget {
@@ -11,6 +12,30 @@ class JoinRoomScreen extends StatefulWidget {
 class JoinRoomScreenState extends State<JoinRoomScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _roomNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController.dispose();
+    _roomNameController.dispose();
+  }
+
+  void joinRoom() {
+    if (_nameController.text.isNotEmpty &&
+        _roomNameController.text.isNotEmpty) {
+      Map data = {
+        "nickname": _nameController.text,
+        "name": _roomNameController.text
+      };
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => PaintScreen(data: data, screenFrom: 'joinRoom'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +70,7 @@ class JoinRoomScreenState extends State<JoinRoomScreen> {
           ),
           const SizedBox(height: 40),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: joinRoom,
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(Colors.blue),
               textStyle: MaterialStateProperty.all(
@@ -58,7 +83,7 @@ class JoinRoomScreenState extends State<JoinRoomScreen> {
               ),
             ),
             child: const Text(
-              "Create",
+              "Join",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
