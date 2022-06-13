@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class PaintScreen extends StatefulWidget {
-  final Map data;
+  final Map<String, String> data;
   final String screenFrom;
-  const PaintScreen({Key? key, required this.data, required this.screenFrom})
+  const PaintScreen({Key? key, required this.screenFrom, required this.data})
       : super(key: key);
 
   @override
@@ -40,9 +40,11 @@ class _PaintScreenState extends State<PaintScreen> {
     _socket.onConnect((data) {
       print("connected");
       _socket.on('updateRoom', (roomData) {
-        setState(() {
-          dataOfRoom = roomData;
-        });
+        if (mounted) {
+          setState(() {
+            dataOfRoom = roomData;
+          });
+        }
         if (roomData['isJoin'] != true) {
           //Start the Timer
         }
@@ -52,9 +54,9 @@ class _PaintScreenState extends State<PaintScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: const Text("paint Screen"),
+    return const Scaffold(
+      body: Center(
+        child: Text("paint Screen"),
       ),
     );
   }
