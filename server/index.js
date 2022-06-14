@@ -86,6 +86,11 @@ mongoose.connect(DB).then(() => console.log('Connection Successful')).catch((e) 
             }
         })
 
+        // WhiteBoard Sockets
+        socket.on('paint', ({ details, roomName }) => {
+            io.to(roomName).emit('points', { details: details, })
+        })
+
 
     })
 
