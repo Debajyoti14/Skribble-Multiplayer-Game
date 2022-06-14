@@ -4,16 +4,16 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 class PaintScreen extends StatefulWidget {
   final Map<String, String> data;
   final String screenFrom;
-  const PaintScreen({Key? key, required this.screenFrom, required this.data})
+  const PaintScreen({Key? key, required this.data, required this.screenFrom})
       : super(key: key);
 
   @override
-  State<PaintScreen> createState() => _PaintScreenState();
+  _PaintScreenState createState() => _PaintScreenState();
 }
 
 class _PaintScreenState extends State<PaintScreen> {
   late IO.Socket _socket;
-  String dataOfRoom = "";
+  Map dataOfRoom = {};
 
   @override
   void initState() {
