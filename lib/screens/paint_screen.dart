@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:skribbl_clone/screens/waiting_lobby_screen.dart';
+import 'package:skribbl_clone/sidebar/player_scoreboard_drawer.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../models/my_custom_paints.dart';
@@ -33,6 +34,9 @@ class _PaintScreenState extends State<PaintScreen> {
   int guessedUserCtr = 0;
   int _start = 60;
   late Timer _timer;
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+  List<Map> scoreboard = [];
+  bool isTextInputReadOnly = false;
 
   @override
   void initState() {
@@ -94,6 +98,15 @@ class _PaintScreenState extends State<PaintScreen> {
           //Start the Timer
           startTimer();
         }
+        scoreboard.clear();
+        for (int i = 0; i < roomData['players'].length; i++) {
+          setState(() {
+            scoreboard.add({
+              'username': roomData['players'][i]['nickname'],
+              'points': roomData['players'][i]['points'].toString(),
+            });
+          });
+        }
       });
 
       _socket.on('points', (point) {
@@ -115,7 +128,7 @@ class _PaintScreenState extends State<PaintScreen> {
           messages.add(msgData);
           guessedUserCtr = msgData['guessedUserCtr'];
         });
-        if (guessedUserCtr = dataOfRoom['players'].length - 1) {
+        if (guessedUserCtr == dataOfRoom['players'].length - 1) {
           _socket.emit('change-turn', dataOfRoom['name']);
         }
         _scrollController.animateTo(
@@ -135,6 +148,7 @@ class _PaintScreenState extends State<PaintScreen> {
                   dataOfRoom = data;
                   renderTextBlank(data['word']);
                   guessedUserCtr = 0;
+                  isTextInputReadOnly = false;
                   _start = 60;
                   points.clear();
                 });
@@ -164,10 +178,29 @@ class _PaintScreenState extends State<PaintScreen> {
         });
       });
 
-      _socket.on('clean-screen', (data) {
+      _socket.on('clear-screen', (data) {
         setState(() {
           points.clear();
         });
+      });
+
+      _socket.on('closeInput', (_) {
+        _socket.emit('updateScore', widget.data['name']);
+        setState(() {
+          isTextInputReadOnly = true;
+        });
+      });
+
+      _socket.on('updateScore', (roomData) {
+        scoreboard.clear();
+        for (int i = 0; i < roomData['players'].length; i++) {
+          setState(() {
+            scoreboard.add({
+              'username': roomData['players'][i]['nickname'],
+              'points': roomData['players'][i]['points'].toString()
+            });
+          });
+        }
       });
     });
   }
@@ -209,6 +242,8 @@ class _PaintScreenState extends State<PaintScreen> {
     }
 
     return Scaffold(
+      key: scaffoldKey,
+      drawer: PlayerScoreDrawer(userData: scoreboard),
       backgroundColor: Colors.white,
       body: dataOfRoom != null
           ? dataOfRoom['isJoin'] != true
@@ -288,7 +323,7 @@ class _PaintScreenState extends State<PaintScreen> {
                                   color: selectedColor),
                               onPressed: () {
                                 _socket.emit(
-                                    'clean-screen', dataOfRoom['name']);
+                                    'clear-screen', dataOfRoom['name']);
                               },
                             ),
                           ],
@@ -341,6 +376,7 @@ class _PaintScreenState extends State<PaintScreen> {
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 20),
                               child: TextField(
+                                readOnly: isTextInputReadOnly,
                                 controller: controller,
                                 autocorrect: false,
                                 onSubmitted: (value) {
@@ -382,7 +418,13 @@ class _PaintScreenState extends State<PaintScreen> {
                               ),
                             ),
                           )
-                        : Container()
+                        : Container(),
+                    SafeArea(
+                      child: IconButton(
+                        onPressed: () => scaffoldKey.currentState!.openDrawer(),
+                        icon: const Icon(Icons.menu),
+                      ),
+                    )
                   ],
                 )
               : WaitingLobbyScreen(
