@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
-import 'package:skrible/models/touch_points.dart';
+import 'touch_points.dart';
 
 class MyCustomPainter extends CustomPainter {
-  List<TouchPoints> pointsList;
   MyCustomPainter({required this.pointsList});
+  List<TouchPoints> pointsList;
 
   List<Offset> offsetPoints = [];
 

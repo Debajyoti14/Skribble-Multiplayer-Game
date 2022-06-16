@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:skrible/screens/create_room_screen.dart';
 
+import 'create_room_screen.dart';
 import 'join_room_screen.dart';
 
 class HomeScreen extends StatefulWidget {

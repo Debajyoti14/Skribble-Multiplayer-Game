@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:skrible/screens/home_screen.dart';
-import 'package:skrible/screens/paint_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
