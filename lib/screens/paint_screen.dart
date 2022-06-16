@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:skribbl_clone/widgets/custom_text_field.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../models/my_custom_paints.dart';
@@ -25,15 +26,34 @@ class _PaintScreenState extends State<PaintScreen> {
   Color selectedColor = Colors.black;
   double opacity = 1;
   double strokeWidth = 2;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   List<Map> messages = [];
   TextEditingController controller = TextEditingController();
+  int guessedUserCtr = 0;
+  int _start = 60;
+  late Timer _timer;
 
   @override
   void initState() {
     super.initState();
     connect();
     print(widget.data);
+  }
+
+  void startTimer() {
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(oneSec, (Timer time) {
+      if (_start == 0) {
+        _socket.emit('change-turn', dataOfRoom['name']);
+        setState(() {
+          _timer.cancel();
+        });
+      } else {
+        setState(() {
+          _start--;
+        });
+      }
+    });
   }
 
   void renderTextBlank(String text) {
@@ -71,6 +91,7 @@ class _PaintScreenState extends State<PaintScreen> {
 
         if (roomData['isJoin'] != true) {
           //Start the Timer
+          startTimer();
         }
       });
 
@@ -91,7 +112,11 @@ class _PaintScreenState extends State<PaintScreen> {
       _socket.on('msg', (msgData) {
         setState(() {
           messages.add(msgData);
+          guessedUserCtr = msgData['guessedUserCtr'];
         });
+        if (guessedUserCtr = dataOfRoom['players'].length - 1) {
+          _socket.emit('change-turn', dataOfRoom['name']);
+        }
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 40,
           duration: const Duration(milliseconds: 200),
@@ -99,9 +124,34 @@ class _PaintScreenState extends State<PaintScreen> {
         );
       });
 
+      _socket.on('change-turn', (data) {
+        String oldWord = dataOfRoom['word'];
+        showDialog(
+            context: context,
+            builder: (context) {
+              Future.delayed(const Duration(seconds: 3), () {
+                setState(() {
+                  dataOfRoom = data;
+                  renderTextBlank(data['word']);
+                  guessedUserCtr = 0;
+                  _start = 60;
+                  points.clear();
+                });
+                Navigator.of(context).pop();
+                _timer.cancel();
+                startTimer();
+              });
+              return AlertDialog(
+                title: Center(
+                  child: Text('Word was $oldWord'),
+                ),
+              );
+            });
+      });
+
       _socket.on('color-change', (colorString) {
         int value = int.parse(colorString, radix: 16);
-        Color otherColor = new Color(value);
+        Color otherColor = Color(value);
         setState(() {
           selectedColor = otherColor;
         });
@@ -237,11 +287,18 @@ class _PaintScreenState extends State<PaintScreen> {
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: textBlankWidget,
-              ),
-              Container(
+              dataOfRoom['turn']['nickname'] != widget.data['nickname']
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: textBlankWidget,
+                    )
+                  : Center(
+                      child: Text(
+                        dataOfRoom['word'],
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                    ),
+              SizedBox(
                   height: MediaQuery.of(context).size.height * 0.3,
                   child: ListView.builder(
                       controller: _scrollController,
@@ -269,47 +326,69 @@ class _PaintScreenState extends State<PaintScreen> {
                       }))
             ],
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                controller: controller,
-                autocorrect: false,
-                onSubmitted: (value) {
-                  if (value.trim().isNotEmpty) {
-                    Map map = {
-                      'username': widget.data['nickname'],
-                      'msg': value.trim(),
-                      'word': dataOfRoom['word'],
-                      'roomName': dataOfRoom['name'],
-                    };
-                    _socket.emit('msg', map);
-                    controller.clear();
-                  }
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.transparent),
+          dataOfRoom['turn']['nickname'] != widget.data['nickname']
+              ? Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: controller,
+                      autocorrect: false,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          Map map = {
+                            'username': widget.data['nickname'],
+                            'msg': value.trim(),
+                            'word': dataOfRoom['word'],
+                            'roomName': dataOfRoom['name'],
+                            'guessedUserCtr': guessedUserCtr,
+                            'totalTime': 60,
+                            'timeTaken': 60 - _start,
+                          };
+                          _socket.emit('msg', map);
+                          controller.clear();
+                        }
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              const BorderSide(color: Colors.transparent),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide:
+                              const BorderSide(color: Colors.transparent),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
+                        filled: true,
+                        fillColor: const Color(0xffF5F5FA),
+                        hintText: 'Your Guess',
+                        hintStyle: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      textInputAction: TextInputAction.done,
+                    ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  filled: true,
-                  fillColor: const Color(0xffF5F5FA),
-                  hintText: 'Your Guess',
-                  hintStyle: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                textInputAction: TextInputAction.done,
-              ),
-            ),
-          )
+                )
+              : Container()
         ],
+      ),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 30),
+        child: FloatingActionButton(
+          onPressed: () {},
+          elevation: 7,
+          backgroundColor: Colors.white,
+          child: Text(
+            '$_start',
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+            ),
+          ),
+        ),
       ),
     );
   }
