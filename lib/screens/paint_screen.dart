@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:skribbl_clone/widgets/custom_text_field.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../models/my_custom_paints.dart';
@@ -19,16 +20,29 @@ class _PaintScreenState extends State<PaintScreen> {
   late IO.Socket _socket;
   Map dataOfRoom = {};
   List<TouchPoints> points = [];
+  List<Widget> textBlankWidget = [];
   StrokeCap strokeType = StrokeCap.round;
   Color selectedColor = Colors.black;
   double opacity = 1;
   double strokeWidth = 2;
+  ScrollController _scrollController = ScrollController();
+  List<Map> messages = [];
+  TextEditingController controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     connect();
     print(widget.data);
+  }
+
+  void renderTextBlank(String text) {
+    textBlankWidget.clear();
+    for (int i = 0; i < text.length; i++) {
+      textBlankWidget.add(
+        const Text('_', style: TextStyle(fontSize: 30)),
+      );
+    }
   }
 
   //Socket io Connection
@@ -49,7 +63,9 @@ class _PaintScreenState extends State<PaintScreen> {
     _socket.onConnect((data) {
       print("connected");
       _socket.on('updateRoom', (roomData) {
+        print(roomData['word']);
         setState(() {
+          renderTextBlank(roomData['word']);
           dataOfRoom = roomData;
         });
 
@@ -71,6 +87,16 @@ class _PaintScreenState extends State<PaintScreen> {
                   ..strokeWidth = strokeWidth));
           });
         }
+      });
+      _socket.on('msg', (msgData) {
+        setState(() {
+          messages.add(msgData);
+        });
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent + 40,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+        );
       });
 
       _socket.on('color-change', (colorString) {
@@ -210,8 +236,78 @@ class _PaintScreenState extends State<PaintScreen> {
                     },
                   ),
                 ],
-              )
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: textBlankWidget,
+              ),
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: ListView.builder(
+                      controller: _scrollController,
+                      shrinkWrap: true,
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        var msg = messages[index].values;
+                        return ListTile(
+                          title: Text(
+                            msg.elementAt(0),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text(
+                            msg.elementAt(1),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                        );
+                      }))
             ],
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                controller: controller,
+                autocorrect: false,
+                onSubmitted: (value) {
+                  if (value.trim().isNotEmpty) {
+                    Map map = {
+                      'username': widget.data['nickname'],
+                      'msg': value.trim(),
+                      'word': dataOfRoom['word'],
+                      'roomName': dataOfRoom['name'],
+                    };
+                    _socket.emit('msg', map);
+                    controller.clear();
+                  }
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  filled: true,
+                  fillColor: const Color(0xffF5F5FA),
+                  hintText: 'Your Guess',
+                  hintStyle: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                textInputAction: TextInputAction.done,
+              ),
+            ),
           )
         ],
       ),
