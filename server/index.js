@@ -123,7 +123,7 @@ io.on('connection', (socket) => {
                 const word = getWord();
                 room.word = word;
                 room.turnIndex = (idx + 1) % room.players.length;
-                room.turn = room.players[room.turnIndex];
+                room.turn = room.players[room.turnIndex]; r
                 room = await room.save();
                 io.to(name).emit('change-turn', room);
             } else {

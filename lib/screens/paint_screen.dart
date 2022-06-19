@@ -8,11 +8,12 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../models/my_custom_paints.dart';
 import '../models/touch_points.dart';
+import 'home_screen.dart';
 
 class PaintScreen extends StatefulWidget {
   final Map<String, String> data;
   final String screenFrom;
-  PaintScreen({Key? key, required this.data, required this.screenFrom})
+  const PaintScreen({Key? key, required this.data, required this.screenFrom})
       : super(key: key);
 
   @override
@@ -109,6 +110,12 @@ class _PaintScreenState extends State<PaintScreen> {
         }
       });
 
+      _socket.on(
+          'notCorrectGame',
+          (data) => Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+              (route) => false));
+
       _socket.on('points', (point) {
         if (point['details'] != null) {
           setState(() {
@@ -203,6 +210,13 @@ class _PaintScreenState extends State<PaintScreen> {
         }
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _socket.dispose();
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -323,7 +337,7 @@ class _PaintScreenState extends State<PaintScreen> {
                                   color: selectedColor),
                               onPressed: () {
                                 _socket.emit(
-                                    'clear-screen', dataOfRoom['name']);
+                                    'clean-screen', dataOfRoom['name']);
                               },
                             ),
                           ],
