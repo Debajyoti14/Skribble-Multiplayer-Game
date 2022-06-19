@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -24,20 +25,23 @@ class _PaintScreenState extends State<PaintScreen> {
   late IO.Socket _socket;
   Map dataOfRoom = {};
   List<TouchPoints> points = [];
-  List<Widget> textBlankWidget = [];
   StrokeCap strokeType = StrokeCap.round;
   Color selectedColor = Colors.black;
   double opacity = 1;
   double strokeWidth = 2;
+  List<Widget> textBlankWidget = [];
   final ScrollController _scrollController = ScrollController();
-  List<Map> messages = [];
   TextEditingController controller = TextEditingController();
+  List<Map> messages = [];
   int guessedUserCtr = 0;
   int _start = 60;
   late Timer _timer;
   var scaffoldKey = GlobalKey<ScaffoldState>();
   List<Map> scoreboard = [];
   bool isTextInputReadOnly = false;
+  int maxPoints = 0;
+  String winner = "";
+  bool isShowFinalLeaderboard = false;
 
   @override
   void initState() {
@@ -93,6 +97,7 @@ class _PaintScreenState extends State<PaintScreen> {
         setState(() {
           renderTextBlank(roomData['word']);
           dataOfRoom = roomData;
+          print(dataOfRoom);
         });
 
         if (roomData['isJoin'] != true) {
@@ -113,7 +118,7 @@ class _PaintScreenState extends State<PaintScreen> {
       _socket.on(
           'notCorrectGame',
           (data) => Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
               (route) => false));
 
       _socket.on('points', (point) {
@@ -147,6 +152,7 @@ class _PaintScreenState extends State<PaintScreen> {
 
       _socket.on('change-turn', (data) {
         String oldWord = dataOfRoom['word'];
+        print("change-turn working");
         showDialog(
             context: context,
             builder: (context) {
@@ -154,8 +160,8 @@ class _PaintScreenState extends State<PaintScreen> {
                 setState(() {
                   dataOfRoom = data;
                   renderTextBlank(data['word']);
-                  guessedUserCtr = 0;
                   isTextInputReadOnly = false;
+                  guessedUserCtr = 0;
                   _start = 60;
                   points.clear();
                 });
@@ -164,10 +170,7 @@ class _PaintScreenState extends State<PaintScreen> {
                 startTimer();
               });
               return AlertDialog(
-                title: Center(
-                  child: Text('Word was $oldWord'),
-                ),
-              );
+                  title: Center(child: Text('Word was $oldWord')));
             });
       });
 

@@ -115,15 +115,19 @@ io.on('connection', (socket) => {
     socket.on('change-turn', async (name) => {
         try {
             let room = await Room.findOne({ name });
+            console.log(room);
             let idx = room.turnIndex;
+            console.log(idx);
             if (idx + 1 === room.players.length) {
                 room.currentRound += 1;
+                console.log(room.currentRound);
             }
             if (room.currentRound <= room.maxRounds) {
+                console.log("Working 2");
                 const word = getWord();
                 room.word = word;
                 room.turnIndex = (idx + 1) % room.players.length;
-                room.turn = room.players[room.turnIndex]; r
+                room.turn = room.players[room.turnIndex];
                 room = await room.save();
                 io.to(name).emit('change-turn', room);
             } else {
