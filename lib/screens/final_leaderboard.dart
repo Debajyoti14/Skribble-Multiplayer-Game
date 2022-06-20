@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class FinalLeaderboard extends StatelessWidget {
   final scoreboard;
   final String winner;
-  FinalLeaderboard(this.scoreboard, this.winner);
+  const FinalLeaderboard(this.scoreboard, this.winner, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class FinalLeaderboard extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: Text(
               "$winner has won the game!",
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 30),
