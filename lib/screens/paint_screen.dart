@@ -77,11 +77,14 @@ class _PaintScreenState extends State<PaintScreen> {
 
   //Socket io Connection
   void connect() {
-    _socket = IO.io('http://192.168.0.106:3000', <String, dynamic>{
+    _socket = IO.io('http://192.168.0.101:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
     _socket.connect();
+    print('----------------------');
+    print('1');
+    print('----------------------');
 
     if (widget.screenFrom == 'createRoom') {
       _socket.emit('create-game', widget.data);
@@ -89,6 +92,9 @@ class _PaintScreenState extends State<PaintScreen> {
       _socket.emit('join-game', widget.data);
     }
 
+    print('----------------------');
+    print('2');
+    print('----------------------');
     //Listen to Socket
     _socket.onConnect((data) {
       print("connected");
@@ -96,7 +102,13 @@ class _PaintScreenState extends State<PaintScreen> {
         print(roomData['word']);
         setState(() {
           renderTextBlank(roomData['word']);
+          print('----------------------');
+          print('3');
+          print('----------------------');
           dataOfRoom = roomData;
+          print('----------------------');
+          print('1');
+          print('----------------------');
           print(dataOfRoom);
         });
 
@@ -262,6 +274,10 @@ class _PaintScreenState extends State<PaintScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
+    print('-----------------------------');
+    print(dataOfRoom.toString());
+    print('-----------------------------');
+
     void selectColor() {
       showDialog(
           context: context,
