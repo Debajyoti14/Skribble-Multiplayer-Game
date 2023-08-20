@@ -51,19 +51,21 @@ class _PaintScreenState extends State<PaintScreen> {
   }
 
   void startTimer() {
-    const oneSec = Duration(seconds: 1);
-    _timer = Timer.periodic(oneSec, (Timer time) {
-      if (_start == 0) {
-        _socket.emit('change-turn', dataOfRoom['name']);
-        setState(() {
-          _timer.cancel();
-        });
-      } else {
-        setState(() {
-          _start--;
-        });
-      }
-    });
+    if (dataOfRoom.isNotEmpty) {
+      const oneSec = Duration(seconds: 1);
+      _timer = Timer.periodic(oneSec, (Timer time) {
+        if (_start == 0) {
+          _socket.emit('change-turn', dataOfRoom['name']);
+          setState(() {
+            _timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      });
+    }
   }
 
   void renderTextBlank(String text) {
@@ -77,24 +79,18 @@ class _PaintScreenState extends State<PaintScreen> {
 
   //Socket io Connection
   void connect() {
-    _socket = IO.io('http://192.168.0.101:3000', <String, dynamic>{
+    print("calling socket connect");
+    _socket = IO.io('http://192.168.0.102:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
     _socket.connect();
-    print('----------------------');
-    print('1');
-    print('----------------------');
 
     if (widget.screenFrom == 'createRoom') {
       _socket.emit('create-game', widget.data);
     } else {
       _socket.emit('join-game', widget.data);
     }
-
-    print('----------------------');
-    print('2');
-    print('----------------------');
     //Listen to Socket
     _socket.onConnect((data) {
       print("connected");
@@ -102,14 +98,10 @@ class _PaintScreenState extends State<PaintScreen> {
         print(roomData['word']);
         setState(() {
           renderTextBlank(roomData['word']);
-          print('----------------------');
-          print('3');
-          print('----------------------');
           dataOfRoom = roomData;
           print('----------------------');
-          print('1');
-          print('----------------------');
           print(dataOfRoom);
+          print('----------------------');
         });
 
         if (roomData['isJoin'] != true) {
@@ -127,11 +119,6 @@ class _PaintScreenState extends State<PaintScreen> {
         }
       });
 
-      _socket.on(
-          'notCorrectGame',
-          (data) => Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false));
       _socket.on(
           'notCorrectGame',
           (data) => Navigator.of(context).pushAndRemoveUntil(
@@ -312,7 +299,7 @@ class _PaintScreenState extends State<PaintScreen> {
       key: scaffoldKey,
       drawer: PlayerScoreDrawer(userData: scoreboard),
       backgroundColor: Colors.white,
-      body: dataOfRoom != null
+      body: dataOfRoom.isNotEmpty
           ? dataOfRoom['isJoin'] != true
               ? !isShowFinalLeaderboard
                   ? Stack(
@@ -326,28 +313,37 @@ class _PaintScreenState extends State<PaintScreen> {
                               height: height * 0.55,
                               child: GestureDetector(
                                 onPanUpdate: (details) {
-                                  _socket.emit('paint', {
-                                    'details': {
-                                      'dx': details.localPosition.dx,
-                                      'dy': details.localPosition.dy,
-                                    },
-                                    'roomName': widget.data['name']
-                                  });
+                                  dataOfRoom['turn']['nickname'] ==
+                                          widget.data['nickname']
+                                      ? _socket.emit('paint', {
+                                          'details': {
+                                            'dx': details.localPosition.dx,
+                                            'dy': details.localPosition.dy,
+                                          },
+                                          'roomName': widget.data['name']
+                                        })
+                                      : null;
                                 },
                                 onPanStart: (details) {
-                                  _socket.emit('paint', {
-                                    'details': {
-                                      'dx': details.localPosition.dx,
-                                      'dy': details.localPosition.dy,
-                                    },
-                                    'roomName': widget.data['name']
-                                  });
+                                  dataOfRoom['turn']['nickname'] ==
+                                          widget.data['nickname']
+                                      ? _socket.emit('paint', {
+                                          'details': {
+                                            'dx': details.localPosition.dx,
+                                            'dy': details.localPosition.dy,
+                                          },
+                                          'roomName': widget.data['name']
+                                        })
+                                      : null;
                                 },
                                 onPanEnd: (details) {
-                                  _socket.emit('paint', {
-                                    'details': null,
-                                    'roomName': widget.data['name'],
-                                  });
+                                  dataOfRoom['turn']['nickname'] ==
+                                          widget.data['nickname']
+                                      ? _socket.emit('paint', {
+                                          'details': null,
+                                          'roomName': widget.data['name'],
+                                        })
+                                      : null;
                                 },
                                 child: SizedBox.expand(
                                     child: ClipRRect(

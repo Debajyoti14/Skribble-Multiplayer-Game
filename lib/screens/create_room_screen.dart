@@ -30,8 +30,8 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       Map<String, String> data = {
         "nickname": _nameController.text,
         "name": _roomNameController.text,
-        "occupancy": _maxRoundsValue!,
-        "maxRounds": _roomSizeValue!
+        "occupancy": _roomSizeValue!,
+        "maxRounds": _maxRoundsValue!
       };
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) =>
@@ -94,6 +94,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             onChanged: (String? value) {
               setState(() {
                 _maxRoundsValue = value;
+                print(_maxRoundsValue);
               });
             },
           ),
@@ -122,6 +123,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             onChanged: (String? value) {
               setState(() {
                 _roomSizeValue = value;
+                print(_roomSizeValue);
               });
             },
           ),

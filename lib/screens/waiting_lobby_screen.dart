@@ -19,6 +19,7 @@ class WaitingLobbyScreen extends StatefulWidget {
 }
 
 class _WaitingLobbyScreenState extends State<WaitingLobbyScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -40,13 +41,16 @@ class _WaitingLobbyScreenState extends State<WaitingLobbyScreen> {
             child: TextField(
               readOnly: true,
               onTap: () {
+                print("Calling Clipboard");
                 //copy Room Name
-                Clipboard.setData(ClipboardData(text: widget.lobbyName));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Copies!'),
-                  ),
-                );
+                Clipboard.setData(ClipboardData(text: widget.lobbyName))
+                    .then((value) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Copied!'),
+                    ),
+                  );
+                });
               },
               decoration: InputDecoration(
                 border: OutlineInputBorder(
