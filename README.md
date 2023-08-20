@@ -6,11 +6,12 @@ This is Multiplayer Flutter app built with MongoDB, NodeJS and Socket.io. Here o
 
 ## Screenshots
 
-<img width="400" src="https://user-images.githubusercontent.com/91759192/174609847-9bfc7898-cbfd-40c7-bd7e-32559f6fb087.png"/>
+<img width="400" src="https://github.com/Debajyoti14/Skribble-Multiplayer-Game/assets/91759192/577ca4ba-e87f-44e4-8080-6a18a2bca215"/>
+<img width="400" src="https://github.com/Debajyoti14/Skribble-Multiplayer-Game/assets/91759192/c90c8cd4-5cb4-4052-a5bd-70e74e20c971"/>
+<img width="400" src="https://github.com/Debajyoti14/Skribble-Multiplayer-Game/assets/91759192/9b377e3e-2ce2-4a0e-b1e2-47909d71dd3b"/>
+<img width="400" src="https://github.com/Debajyoti14/Skribble-Multiplayer-Game/assets/91759192/42740f42-b82d-413d-9ee4-0c9014415e95"/>
+<img width="400" src="https://github.com/Debajyoti14/Skribble-Multiplayer-Game/assets/91759192/714e1e38-6e9d-4030-94af-d3d930df6858"/>
 
-<img width="400" src="https://user-images.githubusercontent.com/91759192/174609992-fbc9e961-bd94-4846-b3cc-50acfc15ab6d.png"/>
-
-<img width="400" src="https://user-images.githubusercontent.com/91759192/174610058-9468b5b4-20b3-4749-b316-c0c73a96a172.png"/>
 
 
 ## Lessons Learned
