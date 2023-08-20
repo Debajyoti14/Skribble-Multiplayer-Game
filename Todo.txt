@@ -1,3 +1,4 @@
 1. Add fonts
 2. NeoPop Button
-3. 
+3. Add dotenv
+4. Fix Dropdown Buttons

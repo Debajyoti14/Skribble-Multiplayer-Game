@@ -20,11 +20,11 @@ class MyCustomPainter extends CustomPainter {
     //If there's a line,we need to connect the points
 
     for (int i = 0; i < pointsList.length - 1; i++) {
-      if (pointsList[i] != null && pointsList[i + 1] != null) {
+      if (pointsList[i + 1] != null) {
         // This is Line
         canvas.drawLine(pointsList[i].points, pointsList[i + 1].points,
             pointsList[i].paint);
-      } else if (pointsList[i] != null && pointsList[i + 1] == null) {
+      } else if (pointsList[i + 1] == null) {
         // This is Point
         offsetPoints.clear();
         offsetPoints.add(pointsList[i].points);

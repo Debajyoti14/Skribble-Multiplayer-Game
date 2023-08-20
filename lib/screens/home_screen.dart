@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../widgets/custom_button.dart';
 import 'create_room_screen.dart';
-import 'join_room_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,6 +19,15 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text(
+          'Skribble',
+          style: TextStyle(
+            fontFamily: GoogleFonts.pressStart2p(fontWeight: FontWeight.w700)
+                .fontFamily,
+            fontSize: 46,
+          ),
+        ),
+        const SizedBox(height: 122),
         const Text(
           'Create/join a room to play!',
           style: TextStyle(
@@ -31,46 +41,23 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => const CreateRoomScreen()),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
-                textStyle: MaterialStateProperty.all(
-                  const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                minimumSize: MaterialStateProperty.all(
-                  Size(MediaQuery.of(context).size.width / 2.5, 50),
-                ),
-              ),
-              child: const Text(
-                'Create',
-                style: TextStyle(fontSize: 16),
-              ),
+            CustomNeoPopButton(
+              labelText: 'Create Room',
+              onPress: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => const CreateRoomScreen()),
+                );
+              },
             ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const JoinRoomScreen()),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
-                textStyle: MaterialStateProperty.all(
-                  const TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                minimumSize: MaterialStateProperty.all(
-                  Size(MediaQuery.of(context).size.width / 2.5, 50),
-                ),
-              ),
-              child: const Text(
-                'Join',
-                style: TextStyle(fontSize: 16),
-              ),
+            CustomNeoPopButton(
+              labelText: 'Join Room',
+              onPress: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) => const CreateRoomScreen()),
+                );
+              },
             ),
           ],
         )

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skribbl_clone/theme.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -14,9 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Skribble',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: lightThemeData,
       home: const HomeScreen(),
     );
   }

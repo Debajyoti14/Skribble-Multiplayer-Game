@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:neopop/utils/color_utils.dart';
+import 'package:neopop/widgets/buttons/neopop_button/neopop_button.dart';
 
 import '../widgets/custom_text_field.dart';
 import 'paint_screen.dart';
