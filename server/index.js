@@ -12,8 +12,8 @@ const getWord = require('./api/getWord');
 app.use(express.json());
 
 // Connect to our MongoDB
-
-const DB = `mongodb+srv://debajyoti14:7r4KqYSpwg4N0Tfx@cluster0.inq8lyq.mongodb.net/?retryWrites=true&w=majority`
+require('dotenv').config();
+const DB = `mongodb+srv://debajyoti14:${process.env.MONGO_KEY}@cluster0.inq8lyq.mongodb.net/?retryWrites=true&w=majority`
 mongoose.connect(DB).then(() => {
     console.log('Connection Succesful!');
 }).catch((e) => {

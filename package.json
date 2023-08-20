@@ -23,7 +23,7 @@
     "component-inherit": "^0.0.3",
     "cookie": "^0.3.1",
     "debug": "^4.1.1",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.3.1",
     "engine.io-parser": "^2.2.1",
     "has-binary2": "^1.0.3",
     "has-cors": "^1.1.0",
@@ -41,7 +41,6 @@
     "ws": "^7.5.8",
     "yeast": "^0.1.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "y"
   },
