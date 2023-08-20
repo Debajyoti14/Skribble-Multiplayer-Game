@@ -261,9 +261,6 @@ class _PaintScreenState extends State<PaintScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    print('-----------------------------');
-    print(dataOfRoom.toString());
-    print('-----------------------------');
 
     void selectColor() {
       showDialog(
@@ -360,36 +357,41 @@ class _PaintScreenState extends State<PaintScreen> {
                                 )),
                               ),
                             ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.color_lens,
-                                      color: selectedColor),
-                                  onPressed: selectColor,
-                                ),
-                                Expanded(
-                                  child: Slider(
-                                      min: 1.0,
-                                      max: 10,
-                                      label: "StrokeWidth $strokeWidth",
-                                      value: strokeWidth,
-                                      onChanged: (double value) {
-                                        Map map = {
-                                          'value': value,
-                                          'roomName': dataOfRoom['name'],
-                                        };
-                                        _socket.emit('stroke-width', map);
-                                      }),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.layers_clear,
-                                      color: selectedColor),
-                                  onPressed: () {
-                                    _socket.emit(
-                                        'clean-screen', dataOfRoom['name']);
-                                  },
-                                ),
-                              ],
+                            Visibility(
+                              visible: dataOfRoom['turn']['nickname'] ==
+                                  widget.data['nickname'],
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.color_lens,
+                                        color: selectedColor),
+                                    onPressed: selectColor,
+                                  ),
+                                  Expanded(
+                                    child: Slider(
+                                        activeColor: Colors.green,
+                                        min: 1.0,
+                                        max: 10,
+                                        label: "StrokeWidth $strokeWidth",
+                                        value: strokeWidth,
+                                        onChanged: (double value) {
+                                          Map map = {
+                                            'value': value,
+                                            'roomName': dataOfRoom['name'],
+                                          };
+                                          _socket.emit('stroke-width', map);
+                                        }),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.layers_clear,
+                                        color: selectedColor),
+                                    onPressed: () {
+                                      _socket.emit(
+                                          'clean-screen', dataOfRoom['name']);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                             dataOfRoom['turn']['nickname'] !=
                                     widget.data['nickname']
@@ -435,52 +437,67 @@ class _PaintScreenState extends State<PaintScreen> {
                         ),
                         dataOfRoom['turn']['nickname'] !=
                                 widget.data['nickname']
-                            ? Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: TextField(
-                                    readOnly: isTextInputReadOnly,
-                                    controller: controller,
-                                    autocorrect: false,
-                                    onSubmitted: (value) {
-                                      if (value.trim().isNotEmpty) {
-                                        Map map = {
-                                          'username': widget.data['nickname'],
-                                          'msg': value.trim(),
-                                          'word': dataOfRoom['word'],
-                                          'roomName': dataOfRoom['name'],
-                                          'guessedUserCtr': guessedUserCtr,
-                                          'totalTime': 60,
-                                          'timeTaken': 60 - _start,
-                                        };
-                                        _socket.emit('msg', map);
-                                        controller.clear();
-                                      }
-                                    },
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.transparent),
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TextField(
+                                      readOnly: isTextInputReadOnly,
+                                      controller: controller,
+                                      autocorrect: false,
+                                      onSubmitted: (value) {
+                                        if (value.trim().isNotEmpty) {
+                                          Map map = {
+                                            'username': widget.data['nickname'],
+                                            'msg': value.trim(),
+                                            'word': dataOfRoom['word'],
+                                            'roomName': dataOfRoom['name'],
+                                            'guessedUserCtr': guessedUserCtr,
+                                            'totalTime': 60,
+                                            'timeTaken': 60 - _start,
+                                          };
+                                          _socket.emit('msg', map);
+                                          controller.clear();
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: const BorderSide(
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: const BorderSide(
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: const BorderSide(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 14),
+                                        filled: true,
+                                        fillColor: const Color(0xffF5F5FA),
+                                        hintText: 'Your Guess',
+                                        hintStyle: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold),
                                       ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.transparent),
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 14),
-                                      filled: true,
-                                      fillColor: const Color(0xffF5F5FA),
-                                      hintText: 'Your Guess',
-                                      hintStyle: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold),
+                                      textInputAction: TextInputAction.done,
                                     ),
-                                    textInputAction: TextInputAction.done,
                                   ),
                                 ),
                               )

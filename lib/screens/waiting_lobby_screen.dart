@@ -19,7 +19,6 @@ class WaitingLobbyScreen extends StatefulWidget {
 }
 
 class _WaitingLobbyScreenState extends State<WaitingLobbyScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -73,6 +72,7 @@ class _WaitingLobbyScreenState extends State<WaitingLobbyScreen> {
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.1),
           const Text('Players: ', style: TextStyle(fontSize: 18)),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.04),
           ListView.builder(
               primary: true,
               shrinkWrap: true,
@@ -80,7 +80,7 @@ class _WaitingLobbyScreenState extends State<WaitingLobbyScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: Text(
-                    '${index + 1}',
+                    '${index + 1}.',
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   ),

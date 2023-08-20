@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:neopop/utils/color_utils.dart';
-import 'package:neopop/widgets/buttons/neopop_button/neopop_button.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:skribbl_clone/widgets/custom_button.dart';
 
+import '../utils.dart';
 import '../widgets/custom_text_field.dart';
 import 'paint_screen.dart';
 
@@ -15,8 +16,8 @@ class CreateRoomScreen extends StatefulWidget {
 class _CreateRoomScreenState extends State<CreateRoomScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _roomNameController = TextEditingController();
-  late String? _maxRoundsValue;
-  late String? _roomSizeValue;
+  String? _maxRoundsValue;
+  String? _roomSizeValue;
   @override
   void dispose() {
     super.dispose();
@@ -27,32 +28,39 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
   void createRoom() {
     if (_nameController.text.isNotEmpty &&
         _roomNameController.text.isNotEmpty &&
-        _maxRoundsValue != null &&
-        _roomSizeValue != null) {
+        _roomSizeValue != null &&
+        _maxRoundsValue != null) {
       Map<String, String> data = {
         "nickname": _nameController.text,
         "name": _roomNameController.text,
         "occupancy": _roomSizeValue!,
         "maxRounds": _maxRoundsValue!
       };
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).push(
+        MaterialPageRoute(
           builder: (context) =>
-              PaintScreen(data: data, screenFrom: "createRoom")));
+              PaintScreen(data: data, screenFrom: "createRoom"),
+        ),
+      );
+    } else {
+      Utils.toastMessage("Invalid Round or Size");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Create a room',
             style: TextStyle(
-              color: Colors.black,
-              fontSize: 24,
+              fontFamily: GoogleFonts.pressStart2p(fontWeight: FontWeight.w700)
+                  .fontFamily,
+              fontSize: 30,
             ),
           ),
           SizedBox(
@@ -85,9 +93,11 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                           style: const TextStyle(color: Colors.black),
                         )))
                 .toList(),
-            hint: const Text(
-              'Select Max Rounds',
-              style: TextStyle(
+            hint: Text(
+              _maxRoundsValue != null
+                  ? '$_maxRoundsValue Rounds'
+                  : 'Select No. of Rounds',
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -95,8 +105,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             ),
             onChanged: (String? value) {
               setState(() {
-                _maxRoundsValue = value;
-                print(_maxRoundsValue);
+                _maxRoundsValue = value!;
               });
             },
           ),
@@ -114,9 +123,11 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                           style: const TextStyle(color: Colors.black),
                         )))
                 .toList(),
-            hint: const Text(
-              'Select Room Size',
-              style: TextStyle(
+            hint: Text(
+              _roomSizeValue == null
+                  ? 'Select Room Size'
+                  : '$_roomSizeValue People',
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -124,33 +135,18 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             ),
             onChanged: (String? value) {
               setState(() {
-                _roomSizeValue = value;
-                print(_roomSizeValue);
+                _roomSizeValue = value!;
               });
             },
           ),
           const SizedBox(height: 40),
-          ElevatedButton(
-            onPressed: createRoom,
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.blue),
-              textStyle: MaterialStateProperty.all(
-                const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              minimumSize: MaterialStateProperty.all(
-                Size(MediaQuery.of(context).size.width / 2.5, 50),
-              ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 2.5,
+            child: CustomNeoPopButton(
+              labelText: "Create",
+              onPress: createRoom,
             ),
-            child: const Text(
-              "Create",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          )
+          ),
         ],
       ),
     );

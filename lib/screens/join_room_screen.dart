@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:skribbl_clone/widgets/custom_button.dart';
 
 import '../widgets/custom_text_field.dart';
 import 'paint_screen.dart';
@@ -40,15 +42,17 @@ class JoinRoomScreenState extends State<JoinRoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Join Room!',
             style: TextStyle(
-              color: Colors.black,
-              fontSize: 24,
+              fontFamily: GoogleFonts.pressStart2p(fontWeight: FontWeight.w700)
+                  .fontFamily,
+              fontSize: 30,
             ),
           ),
           SizedBox(
@@ -70,27 +74,13 @@ class JoinRoomScreenState extends State<JoinRoomScreen> {
             ),
           ),
           const SizedBox(height: 40),
-          ElevatedButton(
-            onPressed: joinRoom,
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.blue),
-              textStyle: MaterialStateProperty.all(
-                const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              minimumSize: MaterialStateProperty.all(
-                Size(MediaQuery.of(context).size.width / 2.5, 50),
-              ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 2.5,
+            child: CustomNeoPopButton(
+              labelText: "Join",
+              onPress: joinRoom,
             ),
-            child: const Text(
-              "Join",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          )
+          ),
         ],
       ),
     );

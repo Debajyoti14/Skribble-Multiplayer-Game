@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skribbl_clone/screens/join_room_screen.dart';
 
 import '../widgets/custom_button.dart';
 import 'create_room_screen.dart';
@@ -27,9 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 46,
           ),
         ),
-        const SizedBox(height: 122),
+        const SizedBox(height: 22),
         const Text(
-          'Create/join a room to play!',
+          'Create / join a room to play!',
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
@@ -55,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPress: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                      builder: (context) => const CreateRoomScreen()),
+                      builder: (context) => const JoinRoomScreen()),
                 );
               },
             ),
